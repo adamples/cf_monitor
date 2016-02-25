@@ -2,12 +2,14 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>SVG-based EDA application</title>
+    <title>CF Monitor</title>
     <link rel="stylesheet" href="3rd_party/semantic-ui-2.1/semantic.min.css">
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div class="ui container">
+      <div id="root"></div>
+    </div>
     <script>
       function assert(condition) {
         if (!condition) throw 'Condition not met!';
@@ -16,5 +18,64 @@
     <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script src="3rd_party/semantic-ui-2.1/semantic.min.js"></script>
     <script src="bundle.js"></script>
+<!--
+    <div style="width: 1000px; margin: 0 auto; padding: 20px 0;">
+      <div class="ui segments">
+        <div class="ui segment">
+          <div class="cf-app-status">
+            <div class="cf-app-identifier">
+              <div class="content">
+                <div class="ui large header">EAPI <span>14.2 b0208</span></div>
+                <div class="meta">proximetry-eapi</div>
+              </div>
+            </div>
+            <div class="cf-app-meta">
+              <div class="ui padded grid">
+
+                <div class="sixteen wide column">
+                  <div class="ui label">STARTED</div>
+                  <div class="ui label">3/3 RUNNING</div>
+                  <div class="ui red label">NO HB</div>
+                </div>
+
+                <div class="two wide column meta">Instances</div>
+                <div class="three wide column">3</div>
+
+                <div class="two wide column meta">RAM</div>
+                <div class="three wide column">1.5GB</div>
+
+                <div class="two wide column meta">HDD</div>
+                <div class="three wide column">256M</div>
+
+                <div class="two wide column meta">Uptime</div>
+                <div class="three wide column">13h 25m 48s</div>
+
+              </div>
+            </div>
+            <div class="cf-app-resources">
+              <div class="ui tiny statistics">
+                <div class="statistic">
+                  <div class="value">
+                    12.7%
+                  </div>
+                  <div class="label">
+                    CPU
+                  </div>
+                </div>
+                <div class="statistic">
+                  <div class="value">
+                    47.8%
+                  </div>
+                  <div class="label">
+                    RAM
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+-->
   </body>
 </html>

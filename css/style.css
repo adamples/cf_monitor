@@ -1,92 +1,49 @@
-body {
-  background: #ddd;
+.cf-app-status {
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
-.segment {
-  background: #fafaf8 ! important;
+.cf-app-identifier {
+  flex-shrink: 1;
 }
 
-svg {
-  background: white;
-  border: 1px solid #eee;
+.cf-app-identifier .header, .cf-app-identifier .meta {
+  margin-bottom: 0;
+  white-space: pre;
 }
 
-.viewport-background {
-  fill: white;
+.cf-app-identifier .header > span.version {
+  font-size: 0.6em;
+  font-weight: normal;
 }
 
-.grid {
-  fill: none;
-  shape-rendering: optimizeSpeed;
-  stroke: black;
+.cf-app-meta {
+  flex-grow: 1;
+  padding: 0 20px 0 60px;
 }
 
-svg.schematic {
-  font-size: 12px;
-  font-family: monospace;
-  text-rendering: geometricPrecision;
+.cf-app-meta .meta {
+  color: gray;
 }
 
-.origin {
-  stroke: black;
-  stroke-width: 1px;
-  opacity: 0.5;
+.cf-app-meta .column {
+  padding: 1px 0 ! important;
 }
 
-/* - Pin - */
-
-.pin path, .pin circle {
-  stroke: #800;
-  stroke-width: 1px;
-  fill: white;
+.cf-app-meta .column.sixteen {
+  padding-bottom: 10px ! important;
 }
 
-.pin .inverter {
-  stroke-width: 1.5px;
-  transform: translate(3px, 0);
-  shape-rendering: geometricPrecision;
+
+.cf-app-resources {
+  flex-shrink: 1;
 }
 
-.pin .clock {
-  stroke-width: 1.5px;
-  shape-rendering: geometricPrecision;
+.cf-app-resources .statistics {
+  flex-wrap: nowrap;
 }
 
-.pin .description text {
-  fill: #555;
-  stroke: none;
-  font-size: 1.0em;
-}
-
-.pin .description .text-offset {
-  transform: translate(-0.5em, 0px);
-}
-
-.pad-name text {
-  fill: #888;
-  stroke: none;
-  font-size: 0.8em;
-}
-
-.pin .pad-name .text-offset {
-  ___transform: translate(0px, -0.1em);
-}
-
-/* - Symbol - */
-
-.symbol .name text, .symbol .value text {
-  fill: #888;
-  stroke: none;
-  font-size: 1.1em;
-}
-
-.symbol .outline-fill {
-  fill: rgba(250, 255, 240, 0.8);
-  stroke: none;
-}
-
-.symbol .outline-stroke {
-  fill: none;
-  stroke: black;
-  stroke-width: 2px;
+.cf-app-resources .statistic {
+  margin-bottom: 0 ! important;
 }
