@@ -28,10 +28,11 @@ const ServicesList = React.createClass({
     });
 
     return (
-    <div>
-      <h2>Showing state of {states.length} service(s)</h2>
-      <div className='ui segments'>{states}</div>
-    </div>);
+      <div>
+        <h2>Showing state of {states.length} service(s)</h2>
+        <div className='ui segments'>{states}</div>
+      </div>
+    );
   }
 });
 

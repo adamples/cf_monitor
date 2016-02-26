@@ -3,6 +3,7 @@ const ReactDOM = require('react-dom');
 const PureRenderMixin = require('react-addons-pure-render-mixin');
 const LoginStore = require('../stores/LoginStore');
 const LoginActions = require('../actions/LoginActions');
+const ServiceStateActions = require('../actions/ServiceStateActions');
 const ServicesList = require('./services_list');
 const LoginForm = require('./login_form');
 
@@ -45,17 +46,44 @@ LoginStore.listen(function (storeState) {
   const auth = storeState.authorization;
   if (auth.get('isSignedIn') !== true) return;
 
-  // const token = auth.get('token');
-  const token = 'eyJhbGciOiJSUzI1NiJ9.eyJqdGkiOiIwYWViMDU4NS0wYmMwLTRjYTQtYTUwNS0xOTQxZjE3Zjk1MWUiLCJzdWIiOiI4ZjViYjk0Yy05YTNmLTRhNjctODdlNy1kMDM2ZGQ4ZDE0N2UiLCJzY29wZSI6WyJwYXNzd29yZC53cml0ZSIsImNsb3VkX2NvbnRyb2xsZXIud3JpdGUiLCJvcGVuaWQiLCJjbG91ZF9jb250cm9sbGVyLnJlYWQiXSwiY2xpZW50X2lkIjoiY2YiLCJjaWQiOiJjZiIsImF6cCI6ImNmIiwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9pZCI6IjhmNWJiOTRjLTlhM2YtNGE2Ny04N2U3LWQwMzZkZDhkMTQ3ZSIsInVzZXJfbmFtZSI6InFhIiwiZW1haWwiOiJxYSIsInJldl9zaWciOiJkMmJhMjRlYSIsImlhdCI6MTQ1NjQxMTk1MiwiZXhwIjoxNDU2NDEyNTUyLCJpc3MiOiJodHRwOi8vdWFhLjU0LjIwMS4yNS42OS54aXAuaW8vb2F1dGgvdG9rZW4iLCJ6aWQiOiJ1YWEiLCJhdWQiOlsiY2YiLCJwYXNzd29yZCIsImNsb3VkX2NvbnRyb2xsZXIiLCJvcGVuaWQiXX0.uNkMn8Gi55Miu70D11ie2UW-74qIlrA133Zgnp28N5IitGqVPe0XNXmPIG_U0QYoosxLOw8I1VR9TfiqD0oSDXdYtrqjNyg5vxbRXkyOjg-qf0H7yAapfqfQXMmM9v1_pzxnMPlarSgiN5Y1w1-Un7xdtRx7mcao1HqQvLD4B8o';
+  const token = auth.get('token');
 
-  var req = $.ajax(auth.get('apiEndpoint') + '/v2/apps', {
+  const req = $.ajax('/cf/cf.54.201.25.69.xip.io/v2/apps?q=space_guid:9c3b1b8c-70b4-4baa-aea3-9b4f9938641f&results-per-page=100', {
     dataType: 'json',
-    headers: {
-      'Authorization': 'bearer ' + token
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader('Authorization', 'bearer ' + token);
     }
   });
 
   $.when(req).then(function (result) {
     console.log(result);
+
+    result.resources.forEach(resource => {
+      const app = resource.entity;
+      ServiceStateActions.addService(app.name);
+      ServiceStateActions.setServiceResources(app.name, app.instances, app.memory, app.disk_quota);
+      ServiceStateActions.setServiceRunning(app.name, app.state === "STARTED");
+
+      if (app.environment_json.VERSION != null)
+        ServiceStateActions.setServiceVersion(app.name, app.environment_json.VERSION);
+
+      setInterval(function () {
+        const req = $.ajax('/cf/cf.54.201.25.69.xip.io' + resource.metadata.url + '/stats', {
+          dataType: 'json',
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader('Authorization', 'bearer ' + token);
+          }
+        });
+
+        $.when(req).then(function (result) {
+          for (var id in result) {
+            const instance = result[id];
+            const usage = instance.stats.usage;
+            ServiceStateActions.setInstanceState(app.name, id, instance.state === "RUNNING",
+              usage.mem, usage.cpu, usage.disk);
+          };
+        });
+      }, 5000);
+    });
   });
 });

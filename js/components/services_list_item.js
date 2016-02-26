@@ -18,13 +18,42 @@ const ServicesListItem = React.createClass({
     return [ ];
   },
 
+  placeholder(s, format) {
+    if (s == null) return "?";
+    else if (format == null) return s;
+    else return format(s);
+  },
+
+  formatBytes(x) {
+    return `${x}MB`;
+  },
+
+  formatPercent(x) {
+    const f = Math.round(x * 100);
+    return `${f}%`;
+  },
+
+  getCpuStatisticColor() {
+    const usage = this.props.service.cpuUsage;
+    if (usage == null || usage < 0.8) return '';
+    else if (usage < 0.9) return 'blue';
+    else return 'red';
+  },
+
+  getMemoryStatisticColor() {
+    const usage = this.props.service.memoryUsage;
+    if (usage == null || usage < 0.8) return '';
+    else if (usage < 0.9) return 'blue';
+    else return 'red';
+  },
+
   render: function() {
     return (
         <div className='ui segment'>
           <div className='cf-app-status'>
             <div className='cf-app-identifier'>
               <div className='content'>
-                <div className='ui large header'>{this.props.service.name} <span className='version'>14.2 b0208</span></div>
+                <div className='ui large header'>{this.props.service.name} <span className='version'>{this.placeholder(this.props.service.version)}</span></div>
                 <div className='meta'>{this.props.service.name}</div>
               </div>
             </div>
@@ -38,32 +67,29 @@ const ServicesListItem = React.createClass({
                 </div>
 
                 <div className='two wide column meta'>Instances</div>
-                <div className='three wide column'>{this.props.service.instancesN ? this.props.service.instancesN : '?'}</div>
+                <div className='three wide column'>{this.placeholder(this.props.service.instancesN)}</div>
 
                 <div className='two wide column meta'>RAM</div>
-                <div className='three wide column'>{this.props.service.memory ? this.props.service.memory : '?'}</div>
+                <div className='three wide column'>{this.placeholder(this.props.service.memory, this.formatBytes)}</div>
 
                 <div className='two wide column meta'>HDD</div>
-                <div className='three wide column'>?</div>
-
-                <div className='two wide column meta'>Uptime</div>
-                <div className='three wide column'>13h 25m 48s</div>
+                <div className='three wide column'>{this.placeholder(this.props.service.diskQuota, this.formatBytes)}</div>
 
               </div>
             </div>
             <div className='cf-app-resources'>
               <div className='ui tiny statistics'>
-                <div className='statistic'>
+                <div className={'statistic ' + this.getCpuStatisticColor()}>
                   <div className='value'>
-                    12.7%
+                    {this.placeholder(this.props.service.cpuUsage, this.formatPercent)}
                   </div>
                   <div className='label'>
                     CPU
                   </div>
                 </div>
-                <div className='statistic'>
+                <div className={'statistic ' + this.getMemoryStatisticColor()}>
                   <div className='value'>
-                    47.8%
+                    {this.placeholder(this.props.service.memoryUsage, this.formatPercent)}
                   </div>
                   <div className='label'>
                     RAM
