@@ -1,9 +1,5 @@
 var Utils = {
 
-  extend: function (klass, mixin) {
-    mixin.apply(klass);
-  },
-
   generateRandomUUID: function () {
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
@@ -12,6 +8,10 @@ var Utils = {
     }
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
       s4() + '-' + s4() + s4() + s4();
+  },
+
+  currentTimestamp() {
+    return Math.round(new Date().getTime() / 1000);
   }
 
 };

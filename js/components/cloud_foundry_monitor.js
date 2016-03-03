@@ -3,7 +3,8 @@ const ReactDOM = require('react-dom');
 const PureRenderMixin = require('react-addons-pure-render-mixin');
 const LoginStore = require('../stores/LoginStore');
 const LoginActions = require('../actions/LoginActions');
-const ServiceStateActions = require('../actions/ServiceStateActions');
+const CFHierarchyActions = require('../actions/CFHierarchyActions');
+const StateVariablesActions = require('../actions/StateVariablesActions');
 const ServicesList = require('./services_list');
 const LoginForm = require('./login_form');
 
@@ -30,7 +31,7 @@ const CloudFoundryMonitor = React.createClass({
     const auth = this.state.authorization;
 
     if (auth != null && auth.get('isSignedIn') === true) {
-      return (<ServicesList/>);
+      return (<ServicesList spaceId='9c3b1b8c-70b4-4baa-aea3-9b4f9938641f' name='qa2'/>);
     }
     else {
       return (<LoginForm authorization={this.state.authorization}/>);
@@ -60,12 +61,16 @@ LoginStore.listen(function (storeState) {
 
     result.resources.forEach(resource => {
       const app = resource.entity;
-      ServiceStateActions.addService(app.name);
-      ServiceStateActions.setServiceResources(app.name, app.instances, app.memory, app.disk_quota);
-      ServiceStateActions.setServiceRunning(app.name, app.state === "STARTED");
 
-      if (app.environment_json.VERSION != null)
-        ServiceStateActions.setServiceVersion(app.name, app.environment_json.VERSION);
+      StateVariablesActions.setVariables([
+        { objectId: resource.metadata.guid, name: "instances", value: app.instances },
+        { objectId: resource.metadata.guid, name: "memoryQuota", value: app.memory * 1024 * 1024 },
+        { objectId: resource.metadata.guid, name: "diskQuota", value: app.disk_quota * 1024 * 1024 },
+        { objectId: resource.metadata.guid, name: "requestedState", value: app.state },
+        { objectId: resource.metadata.guid, name: "environment", value: app.environment_json }
+      ]);
+
+      CFHierarchyActions.addApplication('9c3b1b8c-70b4-4baa-aea3-9b4f9938641f', resource.metadata.guid, app.name);
 
       setInterval(function () {
         const req = $.ajax('/cf/cf.54.201.25.69.xip.io' + resource.metadata.url + '/stats', {
@@ -78,9 +83,21 @@ LoginStore.listen(function (storeState) {
         $.when(req).then(function (result) {
           for (var id in result) {
             const instance = result[id];
+
+            StateVariablesActions.setVariables([
+              { objectId: resource.metadata.guid + "#" + id, name: "state", value: instance.state }
+            ]);
+
+            if (instance.stats == null) continue;
+
             const usage = instance.stats.usage;
-            ServiceStateActions.setInstanceState(app.name, id, instance.state === "RUNNING",
-              usage.mem, usage.cpu, usage.disk);
+
+            StateVariablesActions.setVariables([
+              { objectId: resource.metadata.guid + "#" + id, name: "memoryUsage", value: usage.mem },
+              { objectId: resource.metadata.guid + "#" + id, name: "cpuUsage", value: usage.cpu },
+              { objectId: resource.metadata.guid + "#" + id, name: "diskUsage", value: usage.disk }
+            ]);
+
           };
         });
       }, 5000);
